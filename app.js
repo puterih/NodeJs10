@@ -58,28 +58,37 @@ if (!fs.existsSync(dataPath)) {
   fs.writeFileSync(dataPath, "[]", "utf-8");
 }
 
-// untuk menghindari callback hell, gunakan promise ke async await
-const pertanyaan1 = () => {
+// // untuk menghindari callback hell, gunakan promise ke async await
+// const pertanyaan1 = () => {
+//   return new Promise((resolve, reject) => {
+//     rl.question("Masukkan nama anda : ", (nama) => {
+//       resolve(nama);
+//     });
+//   });
+// };
+
+// const pertanyaan2 = () => {
+//   return new Promise((resolve, reject) => {
+//     rl.question("Massukan email anda :", (email) => {
+//       resolve(email);
+//     });
+//   });
+// };
+
+// Refactoring agar menjadi lebih rapi & tidak perlu buat pertanyaan yg banyak yaitu buat 1 pertanyaan yg bisa digunakan berulang ulang
+const tulisPertanyaan = (pertanyaan) => {
   return new Promise((resolve, reject) => {
-    rl.question("Masukkan nama anda : ", (nama) => {
+    rl.question(pertanyaan, (nama) => {
       resolve(nama);
     });
   });
 };
-
-const pertanyaan2 = () => {
-  return new Promise((resolve, reject) => {
-    rl.question("Massukan email anda :", (email) => {
-      resolve(email);
-    });
-  });
-};
-
 // menggunakan async await
 const main = async () => {
-  const nama = await pertanyaan1();
-  const email = await pertanyaan2();
-  const contact = { nama, email };
+  const nama = await tulisPertanyaan("Masukkan nama anda :");
+  const email = await tulisPertanyaan("Masukkan email anda :");
+  const noHP = await tulisPertanyaan("masukkan noHP anda :");
+  const contact = { nama, email, noHP };
 
   const file = fs.readFileSync("data/contacts.json", "utf8");
   const contacts = JSON.parse(file); // mengubah dari array string ke json
@@ -95,28 +104,3 @@ const main = async () => {
 };
 
 main();
-// // 1 pertanyaan
-// rl.question("Masukkan nama anda : ", (nama) => {
-//   // (nama) menampung ke dalam sebuah callback function
-//   console.log(`Terimakasih ${nama}`);
-
-//   rl.close();
-// });
-
-// 2 pertanyaan callback
-// rl.question("Masukkan nama anda : ", (nama) => {
-//   rl.question("Masukkan noHP anda : ", (noHP) => {
-//     const contact = { nama, noHP };
-//     const file = fs.readFileSync("data/contacts.json", "utf8");
-//     const contacts = JSON.parse(file); // mengubah dari array string ke json
-//     // karena perilaku json seperti array, bisa di push
-
-//     contacts.push(contact);
-//     // contacts adalah array kosong yg kita push ke contact yg baru kita isi nama & noHP. jadi objek masuk ke array
-
-//     // Tulis kedalam contacts.json
-//     fs.writeFileSync("data/contacts.json", JSON.stringify(contacts));
-//     console.log("Terimakasih sudah memasukkan data.");
-//     rl.close();
-//   });
-// });
